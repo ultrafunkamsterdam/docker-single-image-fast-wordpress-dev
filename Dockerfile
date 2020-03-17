@@ -84,7 +84,6 @@ RUN printf '#!/bin/bash \n \
         ln -sf /dev/stdout /tmp/out.log ;\n \
         ln -sf /dev/stderr /tmp/err.log ;\n \
         exec "$@" \
-       # while true; do while read -u 1 line ; do echo ":$line" ; done; done; \n \
   ' > /entrypoint.sh && chmod +x /entrypoint.sh
 
 VOLUME /conf 
