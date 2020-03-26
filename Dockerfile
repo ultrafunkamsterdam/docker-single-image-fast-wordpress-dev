@@ -43,7 +43,10 @@ RUN \
     } \
 }' >/etc/nginx/sites-enabled/default   \ 
   && sed -i "s|/var/log/php7.4-fpm.log|/tmp/out.log|g" /etc/php/7.4/fpm/php-fpm.conf  \
-  && sed -i "s|/var/log/mysql/error.log|/tmp/err.log|g" /etc/mysql/mysql.conf.d/mysqld.cnf 
+  && sed -i "s|/var/log/mysql/error.log|/tmp/err.log|g" /etc/mysql/mysql.conf.d/mysqld.cnf \
+  && sed 's/max_execution_time = 30/max_execution_time = 120/g' /etc/php/7.4/fpm/php.ini  \
+  && sed 's/post_max_size = 8M/post_max_size = 64M/g' /etc/php/7.4/fpm/php.ini \
+  && sed 's/upload_max_filesize = 2M/upload_max_filesize = 64M/g' /etc/php/7.4/fpm/php.ini 
 
 RUN mkdir /conf  \
     && \
