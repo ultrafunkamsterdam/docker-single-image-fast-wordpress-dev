@@ -23,7 +23,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     find /var/log/* | grep -vE "(mysql|nginx|php)" | xargs rm -rf 
 
 RUN \
-    printf 'server { \
+    printf 'client_max_body_size 64M ; \
+    server { \ 
     listen 80 default_server; \
     listen [::]:80 default_server; \
     root /var/www/; \
