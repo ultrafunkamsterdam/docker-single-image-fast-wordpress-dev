@@ -29,7 +29,6 @@ RUN \
         server unix:/run/php/php7.4-fpm.sock max_fails=3 fail_timeout=3s; \
         keepalive 16; \
     } \
-    sendfile on; \
     keepalive_timeout 65; \
     server_tokens off; \
     fastcgi_buffers 256 4k; \
@@ -72,7 +71,7 @@ RUN \
     location ~ \.php$ { \
          include fastcgi_params; \
          # include /etc/nginx/snippets/fastcgi-php.conf; \
-         fastcgi_pass unix:/run/php/php7.4-fpm.sock; \
+         fastcgi_pass fcgi \
 	 fastcgi_cache_bypass $skip_cache; \
          fastcgi_no_cache $skip_cache; \
 	 fastcgi_cache WORDPRESS; \
