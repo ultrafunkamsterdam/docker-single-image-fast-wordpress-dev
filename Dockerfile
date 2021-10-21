@@ -56,12 +56,12 @@ RUN \
     }   \
    
 \
-    # Don't cache uris containing the following segments \
+    # Dont cache uris containing the following segments \
     if ($request_uri ~* "/wp-admin/|/xmlrpc.php|wp-.*.php|/feed/|index.php|sitemap(_index)?.xml") { \
         set $skip_cache 1; \
     }   \
 \
-    # Don't use the cache for logged in users or recent commenters '
+    # Dont use the cache for logged in users or recent commenters \
     if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in") { \
         set $skip_cache 1; \
     } \
@@ -77,6 +77,7 @@ RUN \
          fastcgi_no_cache $skip_cache; \
 	 fastcgi_cache WORDPRESS; \
          fastcgi_cache_valid  60m; \
+	 fastcgi_intercept_errors on; \
     } \
     location ~ /purge(/.*) { \
         fastcgi_cache_purge WORDPRESS "$scheme$request_method$host$1";  \
@@ -139,5 +140,7 @@ RUN printf '#!/bin/bash \n \
 VOLUME /conf 
 VOLUME /www
 VOLUME /var/lib
+EXPOSE 80
+EXPOSE 443
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
