@@ -17,7 +17,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     rm -f mysql-apt* && \
     mkdir /run/php && \
     apt -y install mysql-server && \
-    apt -y install php7.4-fpm php7.4-gd php7.4-mysql php7.4-curl && \
+    apt -y install php7.4-fpm php7.4-gd php7.4-mysql php7.4-curl php7.4-mbstring php7.4-xml php7.4-imagick && \
     apt -y install nginx-extras && \
     apt-get clean && \
     find /var/log/* | grep -vE "(mysql|nginx|php)" | xargs rm -rf 
