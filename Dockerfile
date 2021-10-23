@@ -95,21 +95,20 @@ RUN \
   && sed -i 's/post_max_size = 8M/post_max_size = 64M/g' /etc/php/7.4/fpm/php.ini \
   && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 64M/g' /etc/php/7.4/fpm/php.ini 
 
-RUN mkdir /conf  \
-    && \
-    ln -s /var/www / && \
-    ln -s /etc/php/7.4/fpm/php-fpm.conf /conf/php-fpm.conf && \
-    ln -s /etc/php/7.4/fpm/php.ini /conf/php.ini && \
-    ln -s /etc/nginx/nginx.conf /conf/nginx.conf && \
-    ln -s /etc/nginx/sites-enabled/default /conf/nginx-vhost.conf && \
-    ln -s /etc/mysql/mysql.conf.d/mysqld.cnf /conf/mysqld.cnf 
+# RUN mkdir /conf  \
+#     && \
+#     ln -s /var/www / && \
+#     ln -s /etc/php/7.4/fpm/php-fpm.conf /conf/php-fpm.conf && \
+#     ln -s /etc/php/7.4/fpm/php.ini /conf/php.ini && \
+#     ln -s /etc/nginx/nginx.conf /conf/nginx.conf && \
+#     ln -s /etc/nginx/sites-enabled/default /conf/nginx-vhost.conf && \
+#     ln -s /etc/mysql/mysql.conf.d/mysqld.cnf /conf/mysqld.cnf 
      
-RUN  wget https://wordpress.org/latest.tar.gz && tar xvfz latest.tar.gz -C /var/www --strip 1 && rm -rf latest.tar.gz && \
-     sed -i 's|database_name_here|wordpress|g' www/wp-config-sample.php && \
-     sed -i 's|username_here|wordpress|g' www/wp-config-sample.php && \
-     sed -i 's|password_here|wordpress|g' www/wp-config-sample.php && \
-     mv /var/www/wp-config-sample.php /var/www/wp-config.php && \
-     chown -R www-data:www-data /var/www
+RUN  wget https://wordpress.org/latest.tar.gz && tar xvfz latest.tar.gz -C /tmp/wp --strip 1 && rm -rf latest.tar.gz && \
+     sed -i 's|database_name_here|wordpress|g' /tmp/wp/wp-config-sample.php && \
+     sed -i 's|username_here|wordpress|g' /tmp/wp/wp-config-sample.php && \
+     sed -i 's|password_here|wordpress|g' /tmp/wp/wp-config-sample.php && \
+     mv /tmp/wp/wp-config.php /tmp/wp/wp-config.php 
 
 RUN \
     mysqld --defaults-extra-file=/conf/mysqld.cnf --user=root & PID=$! && sleep 5   \
@@ -122,6 +121,13 @@ RUN \
 
 
 RUN printf '#!/bin/bash \n \
+	mv -n /tmp/wp/* /www/
+	ln -s /www /var && \
+    	ln -s /etc/php/7.4/fpm/php-fpm.conf /conf/php-fpm.conf && \
+    	ln -s /etc/php/7.4/fpm/php.ini /conf/php.ini && \
+    	ln -s /etc/nginx/nginx.conf /conf/nginx.conf && \
+    	ln -s /etc/nginx/sites-enabled/default /conf/nginx-vhost.conf && \
+    	ln -s /etc/mysql/mysql.conf.d/mysqld.cnf /conf/mysqld.cnf 
 	trap "cleanup" 1 2 3 6 9 14 15 \n \
 	cleanup(){ \n \
 	    echo "cleaning up" >> /tmp/out.log \n \
@@ -136,9 +142,9 @@ RUN printf '#!/bin/bash \n \
         exec "$@" \
   ' > /entrypoint.sh && chmod +x /entrypoint.sh
 
-VOLUME /conf 
+VOLUME /conf
 VOLUME /www
-VOLUME /var/lib
+VOLUME /var/lib/mysql
 EXPOSE 80
 EXPOSE 443
 ENTRYPOINT ["/entrypoint.sh"]
